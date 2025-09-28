@@ -3,14 +3,10 @@ use dioxus::prelude::*;
 use dioxus_tw_components::prelude::{
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 };
-use lucide_dioxus::{LockKeyhole, LockKeyholeOpen, Trash2};
+use lucide_dioxus::{LockKeyhole, LockKeyholeOpen};
 use wingedcap::{get_current_unix_time, server::KeyRecord};
 
-use crate::{
-    storage::del_stored_key,
-    ui::button::{Button, ButtonVariant},
-    utils::wait,
-};
+use crate::utils::wait;
 
 #[derive(Props, PartialEq, Clone)]
 pub struct KeyTableComponentProps {
@@ -30,10 +26,6 @@ pub fn KeyTableComponent(
             wait(1000).await;
         }
     });
-
-    let del_key_record = move |service_id: String| {
-        let _ = del_stored_key(service_id);
-    };
 
     rsx! {
         Table { class: "",
@@ -82,19 +74,12 @@ pub fn KeyTableComponent(
                         TableCell { class: "relative bg-red-500/10",
                             div { class: "absolute inset-y-0 flex items-center inset-x-2 overflow-clip",
                                 if key_record.unlocks_at > now() {
-                                    div { class: "flex items-center gap-2",
+                                    div { class: "flex items-center justify-between w-full",
                                         LockKeyhole { class: "size-4 stroke-destructive" }
-                                        span { class: "text-sm", "({key_record.unlocks_at - now()} s)" }
+                                        span { class: "text-sm", "{key_record.unlocks_at - now()} s" }
                                     }
                                 } else {
                                     LockKeyholeOpen { class: "size-4 stroke-green-500" }
-                                }
-
-                                Button {
-                                    variant: ButtonVariant::Ghost,
-                                    class: "px-0 size-8 ml-auto",
-                                    onclick: move |_| del_key_record(key_record.service.clone()),
-                                    Trash2 { class: "size-4 stroke-destructive" }
                                 }
                             }
                         }
