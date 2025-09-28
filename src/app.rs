@@ -37,6 +37,8 @@ pub fn App() -> Element {
         server_pk,
     } = use_context::<AppProps>().clone();
 
+    let mut is_edit_meta_dialog_open = use_signal(|| false);
+
     let mut key_records = use_signal(|| Vec::new());
 
     let mut refresh_key_records = move || {
@@ -100,31 +102,35 @@ pub fn App() -> Element {
         main { class: "relative mx-auto max-w-200 h-screen w-screen min-w-90 grow px-4",
             div { class: "relative flex h-full items-center justify-center",
                 div { class: "w-full self-start pt-[20vh]",
-                    div { class: "flex items-center gap-4 mb-6",
-                        h1 { class: "text-2xl font-bold mr-auto flex items-center gap-2",
-                            "WingedCap Server"
-                            span { class: "font-normal",
-                                EditMetaDialog {
-                                    Pencil { class: "size-5" }
-                                }
-                            }
+                    div { class: "flex items-center gap-2 mb-6",
+                        Button {
+                            class: "w-min gap-2",
+                            onclick: on_copy_server_data,
+
+                            "Copy"
+                            Copy { class: "size-4" }
                         }
 
                         Button {
                             variant: ButtonVariant::Outline,
                             class: "w-min gap-2",
-                            onclick: on_copy_server_data,
+                            onclick: move |_| is_edit_meta_dialog_open.set(true),
 
-                            "Copy Server"
-                            Copy { class: "size-4" }
+                            "Edit"
+                            Pencil { class: "size-5" }
+                        }
+
+                        EditMetaDialog {
+                            open: is_edit_meta_dialog_open(),
+                            onopenchange: move |_open| is_edit_meta_dialog_open.set(_open),
                         }
 
                         Button {
                             variant: ButtonVariant::Destructive,
-                            class: "w-min gap-2",
+                            class: "w-min gap-2 ml-auto",
                             onclick: move |_| delete_all_key_records(),
 
-                            "Delete Keys"
+                            "Delete"
                             Trash2 { class: "size-4" }
                         }
                     }

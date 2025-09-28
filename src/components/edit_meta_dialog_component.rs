@@ -8,32 +8,30 @@ use crate::{
         card::{CardContent, CardDescription, CardHeader, CardTitle},
         hovercard::{HoverCard, HoverCardContent, HoverCardTrigger},
         input_animated_label::InputAnimatedLabel,
-        modal::{Modal, ModalBackground, ModalContent, ModalTrigger},
+        modal::{Modal, ModalBackground, ModalContent},
     },
 };
 
 #[derive(Props, PartialEq, Clone)]
 pub struct EditMetaDialogProps {
+    #[props(optional)]
+    open: bool,
     #[props]
-    children: Element,
+    onopenchange: Callback<bool>,
 }
 
 #[component]
 pub fn EditMetaDialog(props: EditMetaDialogProps) -> Element {
     let mut form_data = use_signal(|| get_stored_meta());
 
-    let mut open = use_signal(|| false);
-
-    let mut handle_submit = move || {
+    let handle_submit = move || {
         let _ = store_meta(form_data.read().clone());
-        open.set(false);
+        props.onopenchange.call(false);
     };
 
     rsx! {
-        Modal { open: open(), onopenchange: move |_open| open.set(_open),
+        Modal { open: props.open, onopenchange: props.onopenchange,
             ModalBackground {}
-
-            ModalTrigger { {props.children} }
 
             ModalContent { class: "",
                 CardHeader { class: "mb-6",
