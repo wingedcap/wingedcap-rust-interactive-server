@@ -1,5 +1,7 @@
 FROM rust:1.90-bookworm AS builder
 
+ARG TUNNEL_HOST
+
 WORKDIR /app
 
 COPY . .
